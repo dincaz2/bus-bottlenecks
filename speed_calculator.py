@@ -6,10 +6,10 @@ from datetime import datetime, timedelta
 # df = pd.read_csv('datasets/shaul_hamelech_routes_2019-03-17_2019-03-23.csv')
 # df['time_recorded_datetime'] = pd.to_datetime(df['time_recorded_datetime'])
 
-df_route = pd.read_csv('datasets/Trip 36893372_060319 route 2293 220319 060000.csv', encoding='latin-1').sort_values('SHAPE_PT_SEQUENCE  ')
-route_dots_list = [(row['SHAPE_PT_LAT  '], row['SHAPE_PT_LON  ']) for index, row in df_route.iterrows()]
-route_dots_dic = {row : index for index, row in enumerate(route_dots_list)}
-print(route_dots_list)
+# df_route = pd.read_csv('datasets/Trip 36893372_060319 route 2293 220319 060000.csv', encoding='latin-1').sort_values('SHAPE_PT_SEQUENCE  ')
+# route_dots_list = [(row['SHAPE_PT_LAT  '], row['SHAPE_PT_LON  ']) for index, row in df_route.iterrows()]
+# route_dots_dic = {row : index for index, row in enumerate(route_dots_list)}
+# print(route_dots_list)
 
 def subroute_distance(route_dots_dic, route_dots_list, origin, dest):
     route = route_dots_list[route_dots_dic[origin] : route_dots_dic[dest] + 1]
@@ -61,9 +61,9 @@ def find_data_time(minutes, date, df, segments):
     current_data = df[df['time_recorded_datetime'].between(curDate, end_date)]
     calc_speed_in_interval(current_data, segments)
 
-origin = route_dots_list[0]
-dest = route_dots_list[-1]
-print(route_distance(route_dots_list))
-
-dot = (32.098752, 34.7794)
-print(find_nearest_dot(route_dots_list, dot))
+# origin = route_dots_list[0]
+# dest = route_dots_list[-1]
+# print(route_distance(route_dots_list))
+#
+# dot = (32.098752, 34.7794)
+#print(find_nearest_dot(route_dots_list, dot))
