@@ -29,5 +29,12 @@ def create_db():
         dbcon.commit()
 
 def segments2db():
-    all_segments = pd.read_csv(r'datasets\segments.csv', encoding="utf-8")
-    all_segments.to_sql()
+    all_segments = pd.read_csv(r'datasets\segments.csv', encoding="utf-8")[['name', 'coordinates']]
+    all_segments.columns = ["Segment", "Geometry"]
+    dbcon = sqlite3.connect('datasets/segments.db')
+    all_segments.to_sql('Points', dbcon, index=False, if_exists='replace')
+
+def segment_interval_data2db():
+    pass
+
+segments2db()
