@@ -6,6 +6,11 @@ import sqlite3
 import codecs
 import geopy.distance
 import numpy as np
+from shapely.ops import nearest_points
+import geopandas as gpd
+from shapely.geometry import Point
+from scipy.spatial import cKDTree
+# unary union of the gpd2 geomtries
 
 def find_data_time(minutes,date,df):
     df = df[pd.to_datetime(df['time_recorded_dateTime']).dt.date == date]
@@ -15,6 +20,10 @@ def find_data_time(minutes,date,df):
     dic_times  = pd.DataFrame(columns=('start_interval', 'end_interval', 'uniqueBus'))
     while nextDate < end_date:
         current_data = df[df['time_recorded_dateTime'].between(curDate,nextDate)]
+        #groupby segment
+        #redundent duplicates by trip id or busid
+        #count
+        #write to csv
         curDate = nextDate
         nextDate = curDate + timedelta(minutes = minutes)
 
@@ -49,20 +58,41 @@ def find_nearest_dot(route_dots_list, lat, lon, epsilon=30):
     if diffs[index] < epsilon:
         return route_dots_list[index]
 
+
+def is_in_range(point1 , point2,epsilon=30):
+    return (abs(geopy.distance.geodesic(point1, point2).m)<epsilon)
+
+
+def ckdnearest(gdA, gdB):
+    nA = (gdA)
+    nB = (gdB)
+    btree = cKDTree(nB)
+    dist, idx = btree.query(nA,k=1)
+    filtered = [gdB[j] if is_in_range(gdB[j],gdA[i]) else None for i,j in enumerate(idx) ]
+    distances = dist.astype(int)
+    #df = pd.DataFrame.from_dict({'distance': dist.astype(int),
+     #                        'bcol': gdB[idx].values})
+    return filtered
+
 def find_segment():
     list_names = []
     data = pd.read_csv(r'datasets\shaul_hamelech_routes_2019-03-17_2019-03-23.csv', encoding = "utf-8")
     data['lat'] = data.lat.astype(float)
     data['lon'] = data.lon.astype(float)
     all_segments = pd.read_csv(r'datasets\segments2.csv', encoding = "utf-8")
-    all_segments = all_segments[all_segments['name'].apply(lambda name: 'shaul' in name)]
+    all_segments = all_segments[all_segments['name'].apply(lambda name: 'Shaul' in name)]
     all_segments['lat'] = all_segments.lat.astype(float)
     all_segments['lon'] = all_segments.lon.astype(float)
+
+    bus_points = [coor for _,coor in data[['lat','lon']].iterrows()]
     route_dots_list = [coor for _,coor in all_segments[['lat','lon']].iterrows()]
-    for _,(lat,lon) in data[['lat','lon']].iterrows():
-        cordi = find_nearest_dot(route_dots_list,lat,lon)
-        if cordi:
-            my_row = all_segments[(all_segments['lat'] == cordi[0]) & (all_segments['lon'] == cordi[1])]
+
+    cordi = ckdnearest(bus_points, route_dots_list)
+
+    for cord in cordi:
+        # cordi = ckdnearest(bus_points,route_dots_list)
+        if cord is not None:
+            my_row = all_segments[(all_segments['lat'] == cord[0]) & (all_segments['lon'] == cord[1])]
             list_names.append(my_row["name"])
         else:
             list_names.append('')
@@ -70,8 +100,8 @@ def find_segment():
     data["segment"] = list_names
     data.to_csv('datasets/shaul_hamelech_routes_with_segments.csv')
 
-# find_segment()
-sql_connection()
+find_segment()
+# sql_connection()
 # df = pd.read_csv(r'datasets\shaul_hamelech_routes_2019-03-17_2019-03-23.csv', encoding = "utf-8" )
 # # df['time_recorded_dateTime'] = df.apply(lambda row: row['timestamp'].split('T')[0] + " "+ row["time_recorded"],axis=1)
 # df['time_recorded_dateTime'] = pd.to_datetime(df['time_recorded_dateTime'])
