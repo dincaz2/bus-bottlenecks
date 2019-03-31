@@ -1,0 +1,43 @@
+
+    $enable-grid-classes:       false;
+    @import "~jquery-toggles/css/toggles-full.css";
+    @import "~leaflet/dist/leaflet.css";
+    @import "~jquery-ui/themes/base/all.css";
+
+    $primary-color: #45a31f;
+    $nav-front-color: $primary-color;
+    $font-color: black;//#595D5C;
+    $nav-front-hover-font-color: #f2f2f2;
+    $nav-back-color: #9CA3A0;
+    $nav-button-font-color: black;
+    $button-container-color: #DEE8E5;
+    $direction-toggle-selected-color: $primary-color;
+
+    $general-font-size: 16px;
+
+    html,
+    body{
+        margin: 0;
+        height: 100%;
+        width: 100%;
+        font-size: $general-font-size;
+        font-weight: 500;
+        color: $font-color;
+    }
+
+    .container {
+        display: grid;
+        height: 100%;
+        grid-template-columns: 100fr 0fr;
+        .map-container {
+            #map {
+                height: 100% !important;
+            }
+        }
+
+        #title-container {
+            display: none;
+    }
+    }
+
+
