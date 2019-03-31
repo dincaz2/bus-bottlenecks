@@ -1,3 +1,4 @@
+0. Download node.js (for npm support): https://nodejs.org/en/download/
 1. Open Git Bash -> Type npm install (only needed first time) then Type: npm run dev
    This will bring up a development server that its index.html file will be served at http://localhost:8080
 2. The main file for edit is "index.ejs" which is like the index.html.
